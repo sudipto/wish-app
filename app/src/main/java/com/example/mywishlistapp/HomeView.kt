@@ -1,6 +1,5 @@
 package com.example.mywishlistapp
 
-import android.widget.Toast
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -15,30 +14,31 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.example.mywishlistapp.data.DummyWish
 import com.example.mywishlistapp.data.Wish
 
 @Composable
 fun HomeView(
-    onAddButtonClick: () -> Unit
+    viewModel: WishViewModel,
+    onAddButtonClick: () -> Unit,
+    onWishItemClick: (Long) -> Unit
 ) {
-    val context = LocalContext.current
+//    val context = LocalContext.current
 
     Scaffold(
         topBar = {
             AppBar(
                 title = "Wishlist"
             ) {
-                Toast.makeText(context, "Back button clicked", Toast.LENGTH_LONG)
-                    .show()
+//                Toast.makeText(context, "Back button clicked", Toast.LENGTH_LONG)
+//                    .show()
             }
         },
         floatingActionButton = {
@@ -57,13 +57,17 @@ fun HomeView(
             }
         }
     ) {
+        val wishList = viewModel.getAllWishes.collectAsState(initial = listOf())
+
         LazyColumn(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(it)
         ) {
-            items(DummyWish.wishList) { wish ->
-                WishItem(wish) { }
+            items(wishList.value) { wish ->
+                WishItem(wish) { wishId ->
+                    onWishItemClick(wishId)
+                }
             }
         }
     }
@@ -72,13 +76,13 @@ fun HomeView(
 @Composable
 fun WishItem(
     wish: Wish,
-    onClick: () -> Unit
+    onWishItemClick: (Long) -> Unit
 ) {
     Card(
         modifier = Modifier.fillMaxWidth()
             .padding(start = 8.dp, top = 8.dp, end = 8.dp)
             .clickable() {
-                onClick()
+                onWishItemClick(wish.id)
             },
         elevation = CardDefaults.cardElevation(10.dp),
         colors = CardDefaults.cardColors(Color.White)
@@ -101,5 +105,5 @@ fun WishItem(
 @Preview
 @Composable
 fun PreviewHomeView() {
-    HomeView({})
+//    HomeView({})
 }

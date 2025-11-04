@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.text.KeyboardOptions
@@ -11,9 +12,14 @@ import androidx.compose.foundation.text.input.TextFieldState
 import androidx.compose.material3.Button
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -23,6 +29,8 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.mywishlistapp.data.Wish
+import kotlinx.coroutines.launch
 
 @Composable
 fun AddUpdateWishScreen(
@@ -31,6 +39,12 @@ fun AddUpdateWishScreen(
     onAddUpdateButtonClick: () -> Unit,
     onBackButtonClick: () -> Unit
 ) {
+    val snackMessage = remember {
+        mutableStateOf("")
+    }
+    val scope = rememberCoroutineScope()
+    val snackBarHostState = remember { SnackbarHostState() }
+
     Scaffold(
         topBar = {
             AppBar(
@@ -40,6 +54,12 @@ fun AddUpdateWishScreen(
             ) {
                 onBackButtonClick()
             }
+        },
+        snackbarHost = {
+            SnackbarHost(
+                snackBarHostState,
+                modifier = Modifier.imePadding()
+            )
         }
     ) {
         Column(
@@ -53,6 +73,7 @@ fun AddUpdateWishScreen(
                 modifier = Modifier.padding(10.dp)
             )
 
+            // For wish title
             WishTextField(
                 label = "Title",
                 value = viewModel.wishTitleState
@@ -62,6 +83,7 @@ fun AddUpdateWishScreen(
                 modifier = Modifier.padding(10.dp)
             )
 
+            // For wish description
             WishTextField(
                 label = "Description",
                 value = viewModel.wishDescriptionState
@@ -74,10 +96,34 @@ fun AddUpdateWishScreen(
             Button(
                 onClick = {
                     if(viewModel.wishTitleState.text != "" && viewModel.wishDescriptionState.text != "") {
-                        TODO("Update wish")
+                        if(id != 0L) {
+                            // update wish
+                            viewModel.updateWish(
+                                Wish(
+                                    id = id,
+                                    title = viewModel.wishTitleState.text.toString().trim(),
+                                    description = viewModel.wishDescriptionState.text.toString().trim()
+                                )
+                            )
+                        } else {
+                            viewModel.addWish(
+                                Wish(
+                                    title = viewModel.wishTitleState.text.toString().trim(),
+                                    description = viewModel.wishDescriptionState.text.toString().trim()
+                                )
+                            )
+
+                            snackMessage.value = "Wish has been created."
+                        }
+                        // The following lambda will help navigate to Homescreen
+                        onAddUpdateButtonClick()
                     } else {
-                        TODO("Add wish")
+                        snackMessage.value = "Enter wish title and description to create one."
+                        scope.launch {
+                            snackBarHostState.showSnackbar(snackMessage.value)
+                        }
                     }
+
                 }
             ) {
                 Text(

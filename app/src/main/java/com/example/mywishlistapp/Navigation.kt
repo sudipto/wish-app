@@ -6,6 +6,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.toRoute
 import kotlinx.serialization.Serializable
 
 
@@ -13,7 +14,9 @@ import kotlinx.serialization.Serializable
 object HomeScreen
 
 @Serializable
-object AddScreen
+data class AddScreen(
+    val id: Long
+)
 
 @Composable
 fun Navigation (
@@ -25,14 +28,24 @@ fun Navigation (
         startDestination = HomeScreen
     ) {
         composable<HomeScreen> {
-            HomeView { navController.navigate(AddScreen) }
+            HomeView(
+                viewModel,
+                { navController.navigate(AddScreen(0L)) }
+            ) { id ->
+                navController.navigate(AddScreen(id))
+            }
         }
 
-        composable<AddScreen> {
+        composable<AddScreen> { backStackEntry ->
+            val addScreen: AddScreen = backStackEntry.toRoute()
+            viewModel.loadWish(addScreen.id)
+
             AddUpdateWishScreen(
-                0L,
+                addScreen.id,
                 viewModel,
-                {}
+                {
+                    navController.navigateUp()
+                }
             ) {
                 navController.navigateUp()
             }
