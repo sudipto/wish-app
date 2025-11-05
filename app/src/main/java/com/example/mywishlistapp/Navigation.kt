@@ -1,6 +1,7 @@
 package com.example.mywishlistapp
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
@@ -38,7 +39,11 @@ fun Navigation (
 
         composable<AddScreen> { backStackEntry ->
             val addScreen: AddScreen = backStackEntry.toRoute()
-            viewModel.loadWish(addScreen.id)
+
+            // The following will call loadWish once. If id changes then recalled.
+            LaunchedEffect(addScreen.id) {
+                viewModel.loadWish(addScreen.id)
+            }
 
             AddUpdateWishScreen(
                 addScreen.id,

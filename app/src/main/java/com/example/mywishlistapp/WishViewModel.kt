@@ -47,13 +47,7 @@ class WishViewModel(
         }
     }
 
-    private var lastLoadedId: Long? = null
-
     fun loadWish(id: Long) {
-        if (lastLoadedId == id) return
-
-        lastLoadedId = id
-
         viewModelScope.launch() {
             if(id == 0L) {
                 if(wishTitleState.text.isNotEmpty() || wishDescriptionState.text.isNotEmpty()) {
