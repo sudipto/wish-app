@@ -12,7 +12,10 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SwipeToDismissBox
+import androidx.compose.material3.SwipeToDismissBoxValue
 import androidx.compose.material3.Text
+import androidx.compose.material3.rememberSwipeToDismissBoxState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Modifier
@@ -28,7 +31,8 @@ import com.example.mywishlistapp.data.Wish
 fun HomeView(
     viewModel: WishViewModel,
     onAddButtonClick: () -> Unit,
-    onWishItemClick: (Long) -> Unit
+    onWishItemClick: (Long) -> Unit,
+    onSwipeWishItem: (Wish) -> Unit
 ) {
 //    val context = LocalContext.current
 
@@ -64,10 +68,34 @@ fun HomeView(
                 .fillMaxSize()
                 .padding(it)
         ) {
-            items(wishList.value) { wish ->
-                WishItem(wish) { wishId ->
-                    onWishItemClick(wishId)
+            items(
+                items = wishList.value,
+                key = { wish -> wish.id }
+            ) { wish ->
+                // Swipe to dismiss
+                val swipeToDismissBoxState = rememberSwipeToDismissBoxState()
+
+                when (swipeToDismissBoxState.currentValue) {
+                    SwipeToDismissBoxValue.StartToEnd -> {
+                        onSwipeWishItem(wish)
+                    }
+
+                    else -> {
+                        false
+                    }
                 }
+
+                SwipeToDismissBox(
+                    state = swipeToDismissBoxState,
+                    modifier = Modifier.fillMaxWidth(),
+                    backgroundContent = {},
+                    enableDismissFromEndToStart = false
+                ) {
+                    WishItem(wish) { wishId ->
+                        onWishItemClick(wishId)
+                    }
+                }
+
             }
         }
     }

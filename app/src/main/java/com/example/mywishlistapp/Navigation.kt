@@ -31,9 +31,10 @@ fun Navigation (
         composable<HomeScreen> {
             HomeView(
                 viewModel,
-                { navController.navigate(AddScreen(0L)) }
-            ) { id ->
-                navController.navigate(AddScreen(id))
+                { navController.navigate(AddScreen(0L)) },
+                { navController.navigate(AddScreen(it)) }
+            ) { wish ->
+                viewModel.deleteWish(wish)
             }
         }
 
