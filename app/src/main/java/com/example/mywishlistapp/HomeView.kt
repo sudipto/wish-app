@@ -1,10 +1,12 @@
 package com.example.mywishlistapp
 
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Card
@@ -18,6 +20,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.rememberSwipeToDismissBoxState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.colorResource
@@ -34,16 +37,11 @@ fun HomeView(
     onWishItemClick: (Long) -> Unit,
     onSwipeWishItem: (Wish) -> Unit
 ) {
-//    val context = LocalContext.current
-
     Scaffold(
         topBar = {
             AppBar(
                 title = "Wishlist"
-            ) {
-//                Toast.makeText(context, "Back button clicked", Toast.LENGTH_LONG)
-//                    .show()
-            }
+            ) {}
         },
         floatingActionButton = {
             FloatingActionButton(
@@ -80,6 +78,7 @@ fun HomeView(
                         onSwipeWishItem(wish)
                     }
 
+                    // Do nothing when swiped to any other direction
                     else -> {
                         false
                     }
@@ -88,7 +87,25 @@ fun HomeView(
                 SwipeToDismissBox(
                     state = swipeToDismissBoxState,
                     modifier = Modifier.fillMaxWidth(),
-                    backgroundContent = {},
+                    backgroundContent = {
+                        Card(
+                            modifier = Modifier.wrapContentSize()
+                                .padding(start = 8.dp, top = 8.dp, end = 8.dp),
+                            elevation = CardDefaults.cardElevation(10.dp)
+                        ) {
+                            Box(
+                                modifier = Modifier.fillMaxSize()
+                                    .padding(start = 8.dp),
+                                contentAlignment = Alignment.CenterStart
+                            ) {
+                                Icon(
+                                    painter = painterResource(R.drawable.delete_24),
+                                    contentDescription = null,
+                                    tint = Color.White
+                                )
+                            }
+                        }
+                    },
                     enableDismissFromEndToStart = false
                 ) {
                     WishItem(wish) { wishId ->
